@@ -5,6 +5,8 @@ export function calculateGoalProgress(milestones) {
   return {
     totalMilestones,
     completedMilestones,
-    progressPercentage: totalMilestones ? Math.round((completedMilestones / totalMilestones) * 100) : 0,
+    progressPercentage: totalMilestones
+      ? Math.round((completedMilestones / totalMilestones) * 100)
+      : 0,
   };
 }

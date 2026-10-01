@@ -5,7 +5,7 @@ export function isMeaningfulProductivityDay(day) {
 const intensityThresholds = {
   overall: [1, 3, 6, 10],
   tasks: [1, 2, 4, 6],
-  focus: [1, 25, 60, 120],
+  focus: [0.01, 25, 60, 120],
   habits: [1, 2, 4, 6],
 };
 

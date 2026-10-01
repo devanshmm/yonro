@@ -3,7 +3,12 @@ import * as habitController from '../controllers/habitController.js';
 import { validate } from '../middleware/validate.js';
 import { idSchema } from '../validators/index.js';
 import { historyQuerySchema, productivityDateSchema } from '../validators/productivitySchemas.js';
-import { habitDefinitionSchema, habitUpdateSchema, habitEntrySchema, habitListQuerySchema } from '../validators/habitSchemas.js';
+import {
+  habitDefinitionSchema,
+  habitUpdateSchema,
+  habitEntrySchema,
+  habitListQuerySchema,
+} from '../validators/habitSchemas.js';
 
 export const habitRouter = Router();
 habitRouter.get('/', validate(habitListQuerySchema, 'query'), habitController.list);

@@ -17,11 +17,18 @@ export function EmptyState({
 }
 export function ErrorState({ error, retry }) {
   return (
-    <div role="alert" className="error-state">
+    <div
+      role="alert"
+      className="error-state"
+    >
       <AlertCircle size={18} />
       <span>{typeof error === 'string' ? error : errorMessage(error)}</span>
       {retry && (
-        <Button variant="ghost" size="sm" onClick={retry}>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={retry}
+        >
           <RotateCw size={14} />
           Retry
         </Button>
@@ -31,7 +38,10 @@ export function ErrorState({ error, retry }) {
 }
 export function LoadingState({ message = 'Getting your workspace ready…' }) {
   return (
-    <div className="loading-state" role="status">
+    <div
+      className="loading-state"
+      role="status"
+    >
       <span className="spinner" />
       {message}
     </div>

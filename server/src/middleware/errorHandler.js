@@ -8,16 +8,29 @@ export function errorHandler(error, req, res, _next) {
       },
     });
   if (error.code === 'P2002')
-    return res.status(409).json({ error: { message: error.meta?.modelName === 'User' ? 'That email or username is already in use' : 'A record with these unique details already exists' } });
+    return res.status(409).json({
+      error: {
+        message:
+          error.meta?.modelName === 'User'
+            ? 'That email or username is already in use'
+            : 'A record with these unique details already exists',
+      },
+    });
   if (error.code === 'P2034') {
-    return res.status(409).json({ error: { message: 'A concurrent update occurred. Please retry.' } });
+    return res
+      .status(409)
+      .json({ error: { message: 'A concurrent update occurred. Please retry.' } });
   }
   if (error.code === 'P2003') {
-    return res.status(409).json({ error: { message: 'The related item changed. Refresh and try again.' } });
+    return res
+      .status(409)
+      .json({ error: { message: 'The related item changed. Refresh and try again.' } });
   }
   if (['P1001', 'P1002', 'P1017'].includes(error.code)) {
     console.error(`[${req.method} ${req.path}] Database unavailable`, error);
-    return res.status(503).json({ error: { message: 'The database is temporarily unavailable. Please retry.' } });
+    return res
+      .status(503)
+      .json({ error: { message: 'The database is temporarily unavailable. Please retry.' } });
   }
   if (error.code === 'P2025')
     return res.status(404).json({ error: { message: 'This item was not found' } });

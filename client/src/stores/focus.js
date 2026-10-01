@@ -81,7 +81,7 @@ export const useFocus = create(
           if (!stillCurrent()) return;
           set({ phase: 'complete', pending: null });
           useResources.getState().invalidate(['activity', 'overview']);
-          await useProductivity.getState().refresh();
+          await useProductivity.getState().refresh(true);
         } catch (error) {
           if (stillCurrent()) set({ phase: 'complete', error: errorMessage(error) });
         }

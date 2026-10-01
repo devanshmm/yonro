@@ -15,7 +15,10 @@ export default function Focus() {
           </h1>
           <p>Pick one thing. Set your time. Be here, fully.</p>
         </div>
-        <Headphones className="heading-icon" size={32} />
+        <Headphones
+          className="heading-icon"
+          size={32}
+        />
       </div>
       <div className="focus-page-grid">
         <FocusTimer />
@@ -46,7 +49,10 @@ export default function Focus() {
             {loading ? (
               <LoadingState />
             ) : error ? (
-              <ErrorState error={error} retry={refresh} />
+              <ErrorState
+                error={error}
+                retry={refresh}
+              />
             ) : !sessions.length ? (
               <EmptyState
                 title="Your next session starts here."

@@ -35,7 +35,13 @@ export default function Tasks() {
     };
   }, [date, today?.productivityDate, tasks]);
   if (loading) return <LoadingState />;
-  if (error) return <ErrorState error={error} retry={refresh} />;
+  if (error)
+    return (
+      <ErrorState
+        error={error}
+        retry={refresh}
+      />
+    );
   const isHistory = date && date !== today.productivityDate;
   const list = (isHistory ? historical || [] : tasks).filter(
     (t) =>
@@ -104,7 +110,10 @@ export default function Tasks() {
           <TaskList tasks={list} />
         )}
       </section>
-      <TaskEditor open={adding} onOpenChange={setAdding} />
+      <TaskEditor
+        open={adding}
+        onOpenChange={setAdding}
+      />
     </>
   );
 }

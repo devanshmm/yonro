@@ -48,4 +48,11 @@ router.use('/habits', habitRouter);
 router.use('/goals', goalRouter);
 router.use('/milestones', milestoneRouter);
 router.get('/analytics/overview', analytics.overview);
-router.get('/analytics/heatmap', validate(historyQuerySchema.extend({ days: z.coerce.number().int().min(1).max(365).default(365) }), 'query'), analytics.heatmap);
+router.get(
+  '/analytics/heatmap',
+  validate(
+    historyQuerySchema.extend({ days: z.coerce.number().int().min(1).max(365).default(365) }),
+    'query',
+  ),
+  analytics.heatmap,
+);

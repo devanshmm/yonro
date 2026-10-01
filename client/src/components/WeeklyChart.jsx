@@ -18,13 +18,20 @@ export function WeeklyChart({ week, large = false }) {
       role="img"
       aria-label={`Weekly task completion: ${days.map((d) => `${d.label} ${d.completionPercentage}%`).join(', ')}`}
     >
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer
+        width="100%"
+        height="100%"
+      >
         <BarChart
           data={days}
           margin={{ top: 10, left: -8, right: 8, bottom: 0 }}
           barSize={large ? 36 : 24}
         >
-          <CartesianGrid stroke="#2a2d29" vertical={false} strokeDasharray="3 6" />
+          <CartesianGrid
+            stroke="#2a2d29"
+            vertical={false}
+            strokeDasharray="3 6"
+          />
           <XAxis
             dataKey="label"
             axisLine={false}
@@ -58,7 +65,10 @@ export function WeeklyChart({ week, large = false }) {
             isAnimationActive={false}
           >
             {days.map((d) => (
-              <Cell key={d.date} fill={d.date === week.today ? '#c6f36a' : '#536b39'} />
+              <Cell
+                key={d.date}
+                fill={d.date === week.today ? '#c6f36a' : '#536b39'}
+              />
             ))}
           </Bar>
         </BarChart>

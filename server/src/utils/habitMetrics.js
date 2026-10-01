@@ -4,7 +4,9 @@ export function isHabitSuccessful(habit, value) {
   if (habit.type === 'BOOLEAN') {
     return value === 1;
   }
-  return habit.targetDirection === 'AT_MOST' ? value <= habit.targetValue : value >= habit.targetValue;
+  return habit.targetDirection === 'AT_MOST'
+    ? value <= habit.targetValue
+    : value >= habit.targetValue;
 }
 
 export function calculateHabitProgress(habit, entry) {
@@ -15,7 +17,9 @@ export function calculateHabitProgress(habit, entry) {
     return entry.completed ? 100 : 0;
   }
   if (habit.targetDirection === 'AT_MOST') {
-    return entry.completed ? 100 : Math.round((habit.targetValue / entry.value) * 100);
+    return entry.value <= habit.targetValue
+      ? 100
+      : Math.min(100, Math.round((habit.targetValue / entry.value) * 100));
   }
   return Math.min(100, Math.round((entry.value / habit.targetValue) * 100));
 }

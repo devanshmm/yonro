@@ -12,6 +12,8 @@ import {
   ArrowUpRight,
   Sparkles,
   ChevronRight,
+  Repeat2,
+  Flag,
 } from 'lucide-react';
 import { useAuth } from '@/stores/auth';
 import { useProductivity } from '@/stores/productivity';
@@ -24,6 +26,8 @@ import { errorMessage, dateLabel } from '@/lib/utils';
 const links = [
   { to: '/', label: 'Home', icon: House },
   { to: '/tasks', label: 'Tasks', icon: ListTodo },
+  { to: '/habits', label: 'Habits', icon: Repeat2 },
+  { to: '/goals', label: 'Goals', icon: Flag },
   { to: '/focus', label: 'Focus', icon: Timer },
   { to: '/analytics', label: 'Analytics', icon: ChartNoAxesCombined },
   { to: '/settings', label: 'Settings', icon: Settings2 },
@@ -53,15 +57,28 @@ export function Sidebar({ open, close }) {
   }
   return (
     <>
-      <div className={`sidebar-backdrop ${open ? 'visible' : ''}`} onClick={close} />
+      <button
+        type="button"
+        className={`sidebar-backdrop ${open ? 'visible' : ''}`}
+        aria-label="Close navigation menu"
+        onClick={close}
+      />
       <aside className={`sidebar ${open ? 'open' : ''}`}>
-        <NavLink to="/" className="brand" onClick={close}>
+        <NavLink
+          to="/"
+          className="brand"
+          onClick={close}
+        >
           <span className="brand-mark">
             L<span />
           </span>
           LOCKIN<span className="brand-period">.</span>
         </NavLink>
-        <button className="mobile-close" aria-label="Close menu" onClick={close}>
+        <button
+          className="mobile-close"
+          aria-label="Close menu"
+          onClick={close}
+        >
           <X size={20} />
         </button>
         <div className="workspace-tag">
@@ -95,7 +112,10 @@ export function Sidebar({ open, close }) {
             <br />
             The rest will follow.
           </p>
-          <NavLink to="/focus" onClick={close}>
+          <NavLink
+            to="/focus"
+            onClick={close}
+          >
             Find your focus
             <ArrowUpRight size={15} />
           </NavLink>
@@ -129,11 +149,20 @@ export function Sidebar({ open, close }) {
 export function TopBar({ openMenu }) {
   const location = useLocation(),
     date = useProductivity((s) => s.today?.productivityDate),
-    page = links.find((l) => l.to === location.pathname)?.label || 'Workspace';
+    page =
+      links.find(
+        (link) =>
+          link.to === location.pathname ||
+          (link.to !== '/' && location.pathname.startsWith(`${link.to}/`)),
+      )?.label || 'Workspace';
   return (
     <header className="topbar">
       <div>
-        <button className="mobile-menu" aria-label="Open menu" onClick={openMenu}>
+        <button
+          className="mobile-menu"
+          aria-label="Open menu"
+          onClick={openMenu}
+        >
           <Menu size={20} />
         </button>
         <span className="breadcrumb-brand">Workspace</span>
@@ -147,7 +176,7 @@ export function TopBar({ openMenu }) {
             ? dateLabel(date, { weekday: 'long', month: 'short', day: 'numeric' })
             : 'Your daily workspace'}
         </span>
-        <span className="phase-badge">PHASE 01</span>
+        <span className="phase-badge">PHASE 02</span>
       </div>
     </header>
   );
@@ -166,7 +195,10 @@ export function Layout() {
     void refresh();
     const interval = setInterval(refresh, 60000);
     const visible = () => {
-      if (document.visibilityState === 'visible') void refresh();
+      if (document.visibilityState === 'visible') {
+        useResources.getState().invalidate();
+        void refresh();
+      }
     };
     document.addEventListener('visibilitychange', visible);
     return () => {
@@ -177,17 +209,29 @@ export function Layout() {
   useEffect(() => {
     if (!today?.dayEndsAt) return;
     const ms = Math.max(100, Date.parse(today.dayEndsAt) - Date.now() + 100);
-    const timeout = setTimeout(() => {
-      useResources.getState().invalidate();
-      void refresh();
-    }, Math.min(ms, 2147483647));
+    const timeout = setTimeout(
+      () => {
+        useResources.getState().invalidate();
+        void refresh();
+      },
+      Math.min(ms, 2147483647),
+    );
     return () => clearTimeout(timeout);
   }, [today?.dayEndsAt, refresh]);
   if (!ready) return <LoadingState />;
-  if (!user) return <Navigate to="/login" replace />;
+  if (!user)
+    return (
+      <Navigate
+        to="/login"
+        replace
+      />
+    );
   return (
     <div className="app-shell">
-      <Sidebar open={open} close={() => setOpen(false)} />
+      <Sidebar
+        open={open}
+        close={() => setOpen(false)}
+      />
       <div className="main-shell">
         <TopBar openMenu={() => setOpen(true)} />
         <main>

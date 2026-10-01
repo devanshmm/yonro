@@ -10,7 +10,10 @@ export function DialogContent({ title, description, children }) {
         <DialogPrimitive.Description className="mt-2 text-sm text-muted-foreground">
           {description}
         </DialogPrimitive.Description>
-        <DialogPrimitive.Close aria-label="Close dialog" className="dialog-close">
+        <DialogPrimitive.Close
+          aria-label="Close dialog"
+          className="dialog-close"
+        >
           <X size={18} />
         </DialogPrimitive.Close>
         {children}

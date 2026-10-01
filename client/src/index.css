@@ -1737,3 +1737,570 @@ tr:last-child td {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Phase 2 extends the existing workspace panels and color tokens. */
+.sidebar {
+  overflow-y: auto;
+}
+.sidebar-backdrop {
+  border: 0;
+  padding: 0;
+}
+.collection-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+}
+.collection-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+.habit-card,
+.goal-card {
+  padding: 22px;
+  background: #1a1e17;
+  border: 1px solid #34422b;
+  border-radius: 10px;
+  min-width: 0;
+}
+.habit-card-heading,
+.goal-card-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.habit-card h3,
+.goal-card h3 {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  overflow-wrap: anywhere;
+}
+.habit-card-heading > a {
+  min-width: 0;
+}
+.entry-badge {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  color: #9ab480;
+  background: #293820;
+  border-radius: 5px;
+  font-size: 9px;
+  padding: 4px 7px;
+  white-space: nowrap;
+}
+.entry-badge.successful {
+  color: #c6f36a;
+  background: #354d21;
+}
+.habit-target {
+  font-size: 11px;
+  color: #a3bd8d;
+  margin-top: 12px;
+  line-height: 1.7;
+}
+.card-description {
+  font-size: 11px;
+  line-height: 1.8;
+  color: #8da578;
+  margin: 13px 0;
+  overflow-wrap: anywhere;
+}
+.habit-value {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: baseline;
+  margin: 24px 0 12px;
+}
+.habit-value strong {
+  font-size: 19px;
+  font-weight: 500;
+  letter-spacing: -0.3px;
+  overflow-wrap: anywhere;
+}
+.habit-value > span {
+  font-size: 10px;
+  color: #a2c180;
+}
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 22px;
+  flex-wrap: wrap;
+}
+.card-actions > a:last-child {
+  margin-left: auto;
+}
+.card-actions > button:first-child {
+  margin-right: auto;
+}
+.form-help {
+  color: #91aa79;
+  font-size: 10px;
+  line-height: 1.8;
+  margin-top: 8px;
+  overflow-wrap: anywhere;
+}
+.form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+.form-actions > button:first-child:not(:last-child) {
+  margin-right: auto;
+}
+.success-state {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 0;
+  color: #c6f36a;
+  font-size: 11px;
+  line-height: 1.7;
+}
+.duration-input {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.duration-input > legend {
+  font-size: 12px;
+  color: #c8cfbf;
+  margin-bottom: 12px;
+}
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #a5c28e;
+  font-size: 11px;
+  margin-bottom: 24px;
+}
+.heading-actions {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.detail-footer {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  margin-top: 25px;
+}
+.habit-stats .stat-value {
+  font-size: 21px;
+  letter-spacing: -0.5px;
+  overflow-wrap: anywhere;
+}
+.habit-chart {
+  height: 255px;
+  width: 100%;
+  min-width: 0;
+}
+.history-table {
+  max-height: 500px;
+}
+.goal-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 33px;
+  height: 33px;
+  border-radius: 8px;
+  background: #344527;
+  color: #b4d18e;
+}
+.goal-title-link {
+  display: flex;
+  gap: 14px;
+  justify-content: space-between;
+  align-items: start;
+  margin-top: 19px;
+}
+.goal-title-link svg {
+  flex-shrink: 0;
+  color: #8faa75;
+}
+.goal-progress-label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 15px;
+  margin: 25px 0 12px;
+}
+.goal-progress-label strong {
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: -0.6px;
+}
+.goal-progress-label > span {
+  font-size: 10px;
+  color: #95ae7e;
+}
+.goal-card-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 9px;
+  color: #8fa778;
+  padding-top: 19px;
+  margin-top: 20px;
+  border-top: 1px solid #314527;
+}
+.goal-card-footer a {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  color: #b9d899;
+}
+.goal-detail-progress {
+  margin-bottom: 23px;
+}
+.goal-detail-progress .goal-progress-label {
+  margin-top: 0;
+}
+.goal-detail-progress .goal-progress-label > strong {
+  font-size: 38px;
+}
+.goal-detail-progress .form-help {
+  margin-top: 15px;
+}
+.milestone-list {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.milestone-item {
+  display: flex;
+  gap: 13px;
+  align-items: center;
+  padding: 19px 0;
+  border-bottom: 1px solid #304126;
+}
+.milestone-item:last-child {
+  border-bottom: 0;
+}
+.milestone-content {
+  flex: 1;
+  min-width: 0;
+}
+.milestone-content strong {
+  font-size: 13px;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.milestone-content p {
+  font-size: 11px;
+  line-height: 1.8;
+  color: #8da875;
+  margin-top: 7px;
+  overflow-wrap: anywhere;
+}
+.milestone-complete strong {
+  text-decoration: line-through;
+  color: #91a77c;
+}
+.milestone-actions {
+  display: flex;
+  gap: 2px;
+}
+.milestone-actions button {
+  width: 30px;
+  height: 30px;
+}
+.growth-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 22px;
+  margin-top: 23px;
+}
+.section-link {
+  font-size: 10px;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  color: #a3c18a;
+  white-space: nowrap;
+}
+.compact-habit-list,
+.compact-goal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.habit-card-compact,
+.goal-card-compact {
+  border: 0;
+  border-radius: 0;
+  padding: 13px 0;
+  background: transparent;
+  border-bottom: 1px solid #33432a;
+}
+.habit-card-compact:last-child,
+.goal-card-compact:last-child {
+  border: 0;
+}
+.habit-card-compact h3,
+.goal-card-compact h3 {
+  font-size: 13px;
+}
+.habit-card-compact .habit-value {
+  margin-top: 15px;
+}
+.habit-card-compact .habit-value strong {
+  font-size: 14px;
+}
+.habit-card-compact .card-actions {
+  margin-top: 14px;
+}
+.goal-card-compact .goal-card-heading {
+  display: none;
+}
+.goal-card-compact .goal-title-link {
+  margin-top: 0;
+}
+.goal-card-compact .goal-progress-label {
+  margin-top: 19px;
+}
+.goal-card-compact .goal-progress-label strong {
+  font-size: 21px;
+}
+.activity-panel {
+  margin-top: 23px;
+}
+.activity-panel .panel-heading {
+  align-items: start;
+  flex-wrap: wrap;
+}
+.heatmap-filters button {
+  font-size: 10px;
+  padding: 7px 10px;
+}
+.heatmap-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+  padding-bottom: 8px;
+}
+.heatmap-content {
+  width: max-content;
+  padding-top: 7px;
+}
+.heatmap-months {
+  display: grid;
+  grid-template-columns: repeat(var(--weeks), 12px);
+  gap: 4px;
+  margin-left: 35px;
+  font-size: 9px;
+  color: #8faa77;
+  height: 24px;
+}
+.heatmap-body {
+  display: flex;
+  gap: 9px;
+}
+.heatmap-weekdays {
+  width: 26px;
+  font-size: 8px;
+  color: #8faa77;
+  height: 108px;
+  display: flex;
+  flex-direction: column;
+  padding-top: 15px;
+  gap: 22px;
+}
+.heatmap-grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(7, 12px);
+  grid-template-columns: repeat(var(--weeks), 12px);
+  gap: 4px;
+}
+.heatmap-cell,
+.heatmap-padding {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+.heatmap-cell {
+  border: 1px solid #a5cc7220;
+  padding: 0;
+}
+.heatmap-cell[aria-pressed='true'] {
+  outline: 1px solid #d9f6b4;
+  outline-offset: 1px;
+}
+.heatmap-cell:hover {
+  outline: 1px solid #c6f36a;
+}
+.level-0 {
+  background: #263320;
+}
+.level-1 {
+  background: #3e572d;
+}
+.level-2 {
+  background: #63873a;
+}
+.level-3 {
+  background: #96bc48;
+}
+.level-4 {
+  background: #c6f36a;
+}
+.heatmap-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 9px;
+  color: #91ad78;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+.heatmap-legend {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.heatmap-legend > span {
+  margin: 0 4px;
+}
+.heatmap-legend i {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+.heatmap-selection {
+  margin-top: 17px;
+  padding-top: 13px;
+  border-top: 1px solid #334329;
+  color: #a6c28c;
+  font-size: 10px;
+  line-height: 1.8;
+  min-height: 33px;
+}
+.analytics-section {
+  margin-bottom: 24px;
+}
+.section-heading {
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 15px;
+}
+.section-heading h2 {
+  font-size: 16px;
+  font-weight: 600;
+}
+.section-heading p {
+  font-size: 10px;
+  color: #8ba574;
+}
+.streak-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.streak-summary .stat-card {
+  padding: 17px;
+}
+.streak-summary .stat-value {
+  font-size: 24px;
+}
+.goal-analytics-list > div {
+  padding: 15px 0;
+  border-bottom: 1px solid #334329;
+}
+.goal-analytics-list > div:last-child {
+  border: 0;
+}
+.goal-analytics-list > div > a {
+  font-size: 12px;
+  color: #d0e4bc;
+}
+.goal-analytics-list .goal-progress-label {
+  margin: 12px 0;
+}
+.goal-analytics-list .goal-progress-label strong {
+  font-size: 17px;
+}
+@media (max-width: 1150px) {
+  .collection-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .heading-actions {
+    flex-wrap: wrap;
+  }
+}
+@media (max-width: 900px) {
+  .growth-grid {
+    grid-template-columns: 1fr;
+  }
+  .habit-stats .stat-value {
+    font-size: 19px;
+  }
+  .page-heading {
+    flex-wrap: wrap;
+  }
+}
+@media (max-width: 700px) {
+  .collection-grid {
+    grid-template-columns: 1fr;
+  }
+  .growth-grid {
+    gap: 17px;
+  }
+  .habit-card,
+  .goal-card {
+    padding: 20px;
+  }
+  .habit-card-compact,
+  .goal-card-compact {
+    padding: 13px 0;
+  }
+  .habit-stats .stat-value {
+    font-size: 18px;
+  }
+  .section-heading {
+    align-items: start;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .heading-actions {
+    width: 100%;
+  }
+  .heading-actions button {
+    flex: 1;
+  }
+  .milestone-item {
+    flex-wrap: wrap;
+  }
+  .milestone-actions {
+    width: 100%;
+    justify-content: flex-end;
+    margin-top: 4px;
+  }
+  .habit-chart {
+    height: 220px;
+  }
+  .heatmap-filters {
+    width: 100%;
+  }
+  .heatmap-selection {
+    font-size: 9px;
+  }
+  .streak-summary .stat-value {
+    font-size: 20px;
+  }
+}

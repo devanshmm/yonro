@@ -41,12 +41,19 @@ export function TaskEditor({ open, onOpenChange, task }) {
     }
   }
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={onOpenChange}
+    >
       <DialogContent
         title={task ? 'Edit your task' : 'Make a little progress.'}
         description="Give your next step a name. Keep it clear and achievable."
       >
-        <form onSubmit={submit} className="form-stack" key={task?.id || 'new'}>
+        <form
+          onSubmit={submit}
+          className="form-stack"
+          key={task?.id || 'new'}
+        >
           <label>
             Task name
             <input
@@ -117,9 +124,16 @@ export function TaskEditor({ open, onOpenChange, task }) {
           {task && (
             <label>
               Status
-              <select aria-label="Status" name="status" defaultValue={task.status}>
+              <select
+                aria-label="Status"
+                name="status"
+                defaultValue={task.status}
+              >
                 {['TODO', 'IN_PROGRESS', 'COMPLETED', 'SKIPPED'].map((s) => (
-                  <option key={s} value={s}>
+                  <option
+                    key={s}
+                    value={s}
+                  >
                     {s.replaceAll('_', ' ')}
                   </option>
                 ))}
@@ -129,14 +143,22 @@ export function TaskEditor({ open, onOpenChange, task }) {
           {error && <ErrorState error={error} />}
           <div className="flex justify-between gap-3">
             {task ? (
-              <Button type="button" variant="destructive" onClick={deleteTask} disabled={busy}>
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={deleteTask}
+                disabled={busy}
+              >
                 <Trash2 size={15} />
                 Delete
               </Button>
             ) : (
               <span />
             )}
-            <Button type="submit" disabled={busy}>
+            <Button
+              type="submit"
+              disabled={busy}
+            >
               {busy ? 'Saving…' : task ? 'Save changes' : 'Create task'}
               <Plus size={16} />
             </Button>
@@ -168,7 +190,10 @@ export function QuickAdd() {
   }
   return (
     <>
-      <form className="quick-add" onSubmit={submit}>
+      <form
+        className="quick-add"
+        onSubmit={submit}
+      >
         <Plus size={18} />
         <input
           name="title"
@@ -177,7 +202,12 @@ export function QuickAdd() {
           maxLength={200}
           required
         />
-        <Button type="submit" size="sm" variant="secondary" disabled={busy}>
+        <Button
+          type="submit"
+          size="sm"
+          variant="secondary"
+          disabled={busy}
+        >
           {busy ? 'Adding…' : 'Add task'}
           <span className="keyboard-hint">↵</span>
         </Button>
@@ -250,7 +280,13 @@ export function TaskList({ tasks }) {
     <>
       <div className="task-list">
         {tasks.length ? (
-          tasks.map((task) => <TaskCard key={task.id} task={task} onEdit={setEditing} />)
+          tasks.map((task) => (
+            <TaskCard
+              key={task.id}
+              task={task}
+              onEdit={setEditing}
+            />
+          ))
         ) : (
           <EmptyState />
         )}

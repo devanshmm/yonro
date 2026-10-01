@@ -9,12 +9,20 @@ import { TaskList, QuickAdd, TaskEditor } from '@/components/TaskList';
 import { FocusTimer } from '@/components/FocusTimer';
 import { WeeklyChart } from '@/components/WeeklyChart';
 import { minutes } from '@/lib/utils';
+import { DashboardGrowth } from '@/components/dashboard/DashboardGrowth';
+import { ProductivityHeatmap } from '@/components/activity/ProductivityHeatmap';
 export default function Dashboard() {
   const user = useAuth((s) => s.user),
     { today, week, tasks, loading, error, refresh } = useProductivity(),
     [adding, setAdding] = useState(false);
   if (loading) return <LoadingState />;
-  if (error) return <ErrorState error={error} retry={refresh} />;
+  if (error)
+    return (
+      <ErrorState
+        error={error}
+        retry={refresh}
+      />
+    );
   const hour = Number(
     new Intl.DateTimeFormat('en-GB', {
       timeZone: user.settings.timezone,
@@ -118,7 +126,11 @@ export default function Dashboard() {
               <h2>
                 Today’s tasks<span className="count-badge">{tasks.length}</span>
               </h2>
-              <Button asChild variant="ghost" size="sm">
+              <Button
+                asChild
+                variant="ghost"
+                size="sm"
+              >
                 <Link to="/tasks">
                   View all
                   <ArrowUpRight size={14} />
@@ -144,7 +156,10 @@ export default function Dashboard() {
           <section className="panel weekly-panel">
             <div className="panel-heading">
               <h2>This week</h2>
-              <Link to="/analytics" aria-label="Open analytics">
+              <Link
+                to="/analytics"
+                aria-label="Open analytics"
+              >
                 <ArrowUpRight size={18} />
               </Link>
             </div>
@@ -160,12 +175,17 @@ export default function Dashboard() {
           </section>
         </div>
       </div>
+      <DashboardGrowth />
+      <ProductivityHeatmap />
       <div className="daily-note">
         <Target size={18} />
         <span>You don’t need a perfect day. Just a purposeful one.</span>
         <span className="note-label">THE LOCKIN MINDSET</span>
       </div>
-      <TaskEditor open={adding} onOpenChange={setAdding} />
+      <TaskEditor
+        open={adding}
+        onOpenChange={setAdding}
+      />
     </>
   );
 }

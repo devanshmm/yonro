@@ -16,7 +16,11 @@ export async function get(req, res) {
 }
 
 export async function update(req, res) {
-  const goal = await goalService.updateGoal(req.user.id, req.validated.params.id, req.validated.body);
+  const goal = await goalService.updateGoal(
+    req.user.id,
+    req.validated.params.id,
+    req.validated.body,
+  );
   res.json({ goal });
 }
 
@@ -26,12 +30,20 @@ export async function remove(req, res) {
 }
 
 export async function createMilestone(req, res) {
-  const milestone = await goalService.createMilestone(req.user.id, req.validated.params.id, req.validated.body);
+  const milestone = await goalService.createMilestone(
+    req.user.id,
+    req.validated.params.id,
+    req.validated.body,
+  );
   res.status(201).json({ milestone });
 }
 
 export async function updateMilestone(req, res) {
-  const milestone = await goalService.updateMilestone(req.user.id, req.validated.params.id, req.validated.body);
+  const milestone = await goalService.updateMilestone(
+    req.user.id,
+    req.validated.params.id,
+    req.validated.body,
+  );
   res.json({ milestone });
 }
 
@@ -41,11 +53,17 @@ export async function removeMilestone(req, res) {
 }
 
 export async function completeMilestone(req, res) {
-  const milestone = await goalService.updateMilestone(req.user.id, req.validated.params.id, { completed: true });
+  const milestone = await goalService.updateMilestone(req.user.id, req.validated.params.id, {
+    completed: true,
+  });
   res.json({ milestone });
 }
 
 export async function reorderMilestones(req, res) {
-  const goal = await goalService.reorderMilestones(req.user.id, req.validated.params.id, req.validated.body.milestoneIds);
+  const goal = await goalService.reorderMilestones(
+    req.user.id,
+    req.validated.params.id,
+    req.validated.body.milestoneIds,
+  );
   res.json({ goal });
 }

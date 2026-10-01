@@ -28,7 +28,10 @@ export async function getGoal(userId, id) {
 }
 
 export async function createGoal(userId, data) {
-  const goal = await prisma.goal.create({ data: { ...data, userId }, include: { milestones: true } });
+  const goal = await prisma.goal.create({
+    data: { ...data, userId },
+    include: { milestones: true },
+  });
   return presentGoal(goal);
 }
 
@@ -49,11 +52,16 @@ export async function createMilestone(userId, goalId, data) {
   return prisma.$transaction(async (transaction) => {
     // Lock the parent to serialize append/reorder/delete operations on this goal.
     await lockOwnedGoal(transaction, userId, goalId);
-    const milestones = await transaction.goalMilestone.findMany({ where: { goalId }, select: { order: true } });
+    const milestones = await transaction.goalMilestone.findMany({
+      where: { goalId },
+      select: { order: true },
+    });
     if (milestones.length >= 100) {
       throw new AppError(400, 'A goal can contain at most 100 milestones');
     }
-    const order = milestones.length ? Math.max(...milestones.map((milestone) => milestone.order)) + 1 : 0;
+    const order = milestones.length
+      ? Math.max(...milestones.map((milestone) => milestone.order)) + 1
+      : 0;
     return transaction.goalMilestone.create({
       data: { ...data, goalId, order, completedAt: data.completed ? new Date() : null },
     });
@@ -62,13 +70,15 @@ export async function createMilestone(userId, goalId, data) {
 
 export async function updateMilestone(userId, id, data) {
   return prisma.$transaction(async (transaction) => {
-    const existing = await transaction.goalMilestone.findUniqueOrThrow({ where: { id, goal: { userId } } });
+    const existing = await transaction.goalMilestone.findUniqueOrThrow({
+      where: { id, goal: { userId } },
+    });
     await lockOwnedGoal(transaction, userId, existing.goalId);
     // Re-read after obtaining the parent lock so simultaneous completion updates agree.
     const current = await transaction.goalMilestone.findUniqueOrThrow({ where: { id } });
     let completedAt = current.completedAt;
     if (data.completed !== undefined) {
-      completedAt = data.completed ? current.completedAt ?? new Date() : null;
+      completedAt = data.completed ? (current.completedAt ?? new Date()) : null;
     }
     return transaction.goalMilestone.update({ where: { id }, data: { ...data, completedAt } });
   });
@@ -78,7 +88,9 @@ async function writeMilestoneOrder(transaction, goalId, milestoneIds) {
   if (!milestoneIds.length) {
     return;
   }
-  const mapping = Prisma.join(milestoneIds.map((id, order) => Prisma.sql`(${id}::uuid, ${order}::integer)`));
+  const mapping = Prisma.join(
+    milestoneIds.map((id, order) => Prisma.sql`(${id}::uuid, ${order}::integer)`),
+  );
   // Temporary negative positions avoid unique-order collisions during a swap.
   // Both statements are atomic to readers because they run in the same transaction.
   await transaction.$executeRaw`
@@ -98,9 +110,15 @@ async function writeMilestoneOrder(transaction, goalId, milestoneIds) {
 export async function reorderMilestones(userId, goalId, milestoneIds) {
   await prisma.$transaction(async (transaction) => {
     await lockOwnedGoal(transaction, userId, goalId);
-    const milestones = await transaction.goalMilestone.findMany({ where: { goalId }, select: { id: true } });
+    const milestones = await transaction.goalMilestone.findMany({
+      where: { goalId },
+      select: { id: true },
+    });
     const existingIds = new Set(milestones.map((milestone) => milestone.id));
-    if (existingIds.size !== milestoneIds.length || milestoneIds.some((id) => !existingIds.has(id))) {
+    if (
+      existingIds.size !== milestoneIds.length ||
+      milestoneIds.some((id) => !existingIds.has(id))
+    ) {
       throw new AppError(400, 'Provide every milestone in this goal exactly once');
     }
     await writeMilestoneOrder(transaction, goalId, milestoneIds);
@@ -110,12 +128,20 @@ export async function reorderMilestones(userId, goalId, milestoneIds) {
 
 export async function deleteMilestone(userId, id) {
   await prisma.$transaction(async (transaction) => {
-    const existing = await transaction.goalMilestone.findUniqueOrThrow({ where: { id, goal: { userId } } });
+    const existing = await transaction.goalMilestone.findUniqueOrThrow({
+      where: { id, goal: { userId } },
+    });
     await lockOwnedGoal(transaction, userId, existing.goalId);
     await transaction.goalMilestone.delete({ where: { id } });
     const remaining = await transaction.goalMilestone.findMany({
-      where: { goalId: existing.goalId }, select: { id: true }, orderBy: milestoneOrder,
+      where: { goalId: existing.goalId },
+      select: { id: true },
+      orderBy: milestoneOrder,
     });
-    await writeMilestoneOrder(transaction, existing.goalId, remaining.map((milestone) => milestone.id));
+    await writeMilestoneOrder(
+      transaction,
+      existing.goalId,
+      remaining.map((milestone) => milestone.id),
+    );
   });
 }

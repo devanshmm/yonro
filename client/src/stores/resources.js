@@ -37,23 +37,36 @@ export const useResources = create((set, get) => ({
       return cached.data;
     }
     const epoch = cacheEpoch;
-    set((state) => ({ cache: { ...state.cache, [key]: { ...cached, loading: true, error: null } } }));
+    set((state) => ({
+      cache: { ...state.cache, [key]: { ...cached, loading: true, error: null } },
+    }));
     // Shared requests survive route changes; epoch/request checks prevent an old
     // account's response or a pre-mutation response from replacing current data.
-    const request = Promise.resolve().then(loader).then((data) => {
-      if (epoch === cacheEpoch && pendingRequests.get(key) === request) {
-        set((state) => ({ cache: { ...state.cache, [key]: { data, loading: false, error: null, stale: false } } }));
-      }
-      return data;
-    }).catch((error) => {
-      if (epoch === cacheEpoch && pendingRequests.get(key) === request) {
-        set((state) => ({ cache: { ...state.cache, [key]: { ...state.cache[key], loading: false, error, stale: true } } }));
-      }
-    }).finally(() => {
-      if (pendingRequests.get(key) === request) {
-        pendingRequests.delete(key);
-      }
-    });
+    const request = Promise.resolve()
+      .then(loader)
+      .then((data) => {
+        if (epoch === cacheEpoch && pendingRequests.get(key) === request) {
+          set((state) => ({
+            cache: { ...state.cache, [key]: { data, loading: false, error: null, stale: false } },
+          }));
+        }
+        return data;
+      })
+      .catch((error) => {
+        if (epoch === cacheEpoch && pendingRequests.get(key) === request) {
+          set((state) => ({
+            cache: {
+              ...state.cache,
+              [key]: { ...state.cache[key], loading: false, error, stale: true },
+            },
+          }));
+        }
+      })
+      .finally(() => {
+        if (pendingRequests.get(key) === request) {
+          pendingRequests.delete(key);
+        }
+      });
     pendingRequests.set(key, request);
     return request;
   },

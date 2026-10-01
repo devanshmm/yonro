@@ -26,11 +26,20 @@ export default function Auth() {
     }
   }
   if (!ready) return <LoadingState />;
-  if (user) return <Navigate to="/" replace />;
+  if (user)
+    return (
+      <Navigate
+        to="/"
+        replace
+      />
+    );
   return (
     <div className="auth-shell">
       <section className="auth-story">
-        <Link to="/login" className="brand">
+        <Link
+          to="/login"
+          className="brand"
+        >
           <span className="brand-mark">
             L<span />
           </span>
@@ -107,7 +116,11 @@ export default function Auth() {
               ? 'A little intention today. A different tomorrow.'
               : 'Take a breath. Let’s pick up where you left off.'}
           </p>
-          <form className="form-stack" onSubmit={submit} key={location.pathname}>
+          <form
+            className="form-stack"
+            onSubmit={submit}
+            key={location.pathname}
+          >
             {signup && (
               <>
                 <div className="form-row">
@@ -167,9 +180,15 @@ export default function Auth() {
               />
             </label>
             {(error || initError) && (
-              <ErrorState error={error || initError} retry={initError ? init : undefined} />
+              <ErrorState
+                error={error || initError}
+                retry={initError ? init : undefined}
+              />
             )}
-            <Button type="submit" disabled={busy}>
+            <Button
+              type="submit"
+              disabled={busy}
+            >
               {busy
                 ? 'Getting things ready…'
                 : signup
@@ -180,7 +199,10 @@ export default function Auth() {
           </form>
           <div className="auth-switch">
             {signup ? 'Already have an account?' : 'New to LOCKIN?'}{' '}
-            <Link to={signup ? '/login' : '/signup'} onClick={() => setError(null)}>
+            <Link
+              to={signup ? '/login' : '/signup'}
+              onClick={() => setError(null)}
+            >
               {signup ? 'Log in' : 'Create an account'}
               <ArrowUpRightSmall />
             </Link>

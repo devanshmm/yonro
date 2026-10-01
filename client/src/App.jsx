@@ -10,6 +10,10 @@ import Tasks from './pages/Tasks';
 import Focus from './pages/Focus';
 import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
+import HabitsPage from './pages/HabitsPage';
+import HabitDetailsPage from './pages/HabitDetailsPage';
+import GoalsPage from './pages/GoalsPage';
+import GoalDetailsPage from './pages/GoalDetailsPage';
 export default function App() {
   const init = useAuth((s) => s.init);
   useEffect(() => {
@@ -25,14 +29,51 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<Auth />} />
-        <Route path="/signup" element={<Auth />} />
+        <Route
+          path="/login"
+          element={<Auth />}
+        />
+        <Route
+          path="/signup"
+          element={<Auth />}
+        />
         <Route element={<Layout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="tasks" element={<Tasks />} />
-          <Route path="focus" element={<Focus />} />
-          <Route path="analytics" element={<Analytics />} />
-          <Route path="settings" element={<Settings />} />
+          <Route
+            index
+            element={<Dashboard />}
+          />
+          <Route
+            path="tasks"
+            element={<Tasks />}
+          />
+          <Route
+            path="focus"
+            element={<Focus />}
+          />
+          <Route
+            path="analytics"
+            element={<Analytics />}
+          />
+          <Route
+            path="settings"
+            element={<Settings />}
+          />
+          <Route
+            path="habits"
+            element={<HabitsPage />}
+          />
+          <Route
+            path="habits/:id"
+            element={<HabitDetailsPage />}
+          />
+          <Route
+            path="goals"
+            element={<GoalsPage />}
+          />
+          <Route
+            path="goals/:id"
+            element={<GoalDetailsPage />}
+          />
           <Route
             path="*"
             element={

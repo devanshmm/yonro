@@ -16,7 +16,11 @@ export async function get(req, res) {
 }
 
 export async function update(req, res) {
-  const habit = await habitService.updateHabit(req.user, req.validated.params.id, req.validated.body);
+  const habit = await habitService.updateHabit(
+    req.user,
+    req.validated.params.id,
+    req.validated.body,
+  );
   res.json({ habit });
 }
 
@@ -26,17 +30,29 @@ export async function remove(req, res) {
 }
 
 export async function recordEntry(req, res) {
-  const entry = await habitService.recordEntry(req.user, req.validated.params.id, req.validated.body);
+  const entry = await habitService.recordEntry(
+    req.user,
+    req.validated.params.id,
+    req.validated.body,
+  );
   res.json({ entry });
 }
 
 export async function entries(req, res) {
-  const history = await habitService.listEntries(req.user, req.validated.params.id, req.validated.query.days);
+  const history = await habitService.listEntries(
+    req.user,
+    req.validated.params.id,
+    req.validated.query.days,
+  );
   res.json(history);
 }
 
 export async function analytics(req, res) {
-  const analytics = await habitService.getHabitAnalytics(req.user, req.validated.params.id, req.validated.query.days);
+  const analytics = await habitService.getHabitAnalytics(
+    req.user,
+    req.validated.params.id,
+    req.validated.query.days,
+  );
   res.json(analytics);
 }
 

@@ -23,7 +23,7 @@ export default function Settings() {
     setSaved(false);
     try {
       await update(body);
-      await useProductivity.getState().refresh();
+      await useProductivity.getState().refresh(true);
       setSaved(true);
     } catch (e) {
       setError(errorMessage(e));
@@ -54,7 +54,10 @@ export default function Settings() {
           <p>A workspace that fits the way you work.</p>
         </div>
       </div>
-      <form className="settings-form form-stack" onSubmit={submit}>
+      <form
+        className="settings-form form-stack"
+        onSubmit={submit}
+      >
         <section className="panel">
           <div className="section-title">
             <Clock3 size={21} />
@@ -75,7 +78,11 @@ export default function Settings() {
             </label>
             <label>
               Timezone
-              <select aria-label="Timezone" name="timezone" defaultValue={user.settings.timezone}>
+              <select
+                aria-label="Timezone"
+                name="timezone"
+                defaultValue={user.settings.timezone}
+              >
                 {zones.map((zone) => (
                   <option key={zone}>{zone}</option>
                 ))}
@@ -111,9 +118,16 @@ export default function Settings() {
             ['showFocusTime', 'Show focus time'],
             ['showStreak', 'Show current streak'],
           ].map(([key, label]) => (
-            <label className="switch-row" key={key}>
+            <label
+              className="switch-row"
+              key={key}
+            >
               <span>{label}</span>
-              <input type="checkbox" name={key} defaultChecked={user.settings[key]} />
+              <input
+                type="checkbox"
+                name={key}
+                defaultChecked={user.settings[key]}
+              />
             </label>
           ))}
         </section>
@@ -125,7 +139,10 @@ export default function Settings() {
               Preferences saved
             </span>
           )}
-          <Button type="submit" disabled={busy}>
+          <Button
+            type="submit"
+            disabled={busy}
+          >
             {busy ? 'Saving…' : 'Save preferences'}
           </Button>
         </div>

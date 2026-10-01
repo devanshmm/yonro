@@ -1,6 +1,6 @@
 # YONRO / LOCKIN
 
-LOCKIN is a personal productivity workspace for people building toward their goals. YONRO is the repository name. Phase 1 implements authentication, personal tasks, a focus timer, daily progress, basic weekly analytics, and user preferences. Social features are intentionally reserved for later phases.
+LOCKIN is a personal productivity workspace for people building toward their goals. YONRO is the repository name. Phases 1–2 implement authentication, personal tasks, a focus timer, daily progress, custom habits, long-term goals and milestones, overall streaks, activity heatmaps, expanded analytics, and user preferences. Social features are intentionally reserved for later phases.
 
 ## Stack
 
@@ -107,7 +107,7 @@ Statuses: `TODO`, `IN_PROGRESS`, `COMPLETED`, `SKIPPED`. Priorities: `LOW`, `MED
 - **Planned tasks:** all tasks assigned to that productivity date, including skipped tasks.
 - **Completed tasks:** assigned tasks currently marked `COMPLETED`.
 - **Completion:** rounded `completed / planned × 100`; an empty day is 0%.
-- **Streak:** consecutive productivity dates with at least one completed task. If today has none yet, the streak may end yesterday. Missing days break it. Uncompleting/deleting tasks updates the metric.
+- **Overall streak:** consecutive productivity dates with at least one completed planned task, successful habit entry, or finished focus session. If today has none yet, the streak may end yesterday. Missing days break it. Uncompleting/deleting tasks updates the metric.
 - **Week:** Monday–Sunday based on the current productivity-date label. Weekly completion is weighted across all planned tasks, not an average of daily percentages. Focus time includes completed sessions only.
 - **Editing plans:** adding, deleting, rescheduling, skipping, and uncompleting update the live denominator. Phase 1 does not freeze a beginning-of-day planning snapshot.
 - **Settings changes:** existing records retain their assigned dates. Settings govern new task assignments, new focus saves, and which date is considered today. Historical records are not silently rewritten.
@@ -202,7 +202,7 @@ npm run build
 npm start
 ```
 
-Serve `client/dist` with a web server that falls back to `index.html` for React routes and reverse-proxies `/api` to the API on port 4000. Set `NODE_ENV=production`, a real `DATABASE_URL`, a strong `JWT_SECRET`, and the exact HTTPS `CLIENT_ORIGIN`. Cookies are Secure in production. Express binds to loopback by default for a same-machine reverse proxy; adapt the bind address and trusted-proxy configuration deliberately for container/platform deployments. The development Compose password must not be reused in production. No production host is configured or deployed in Phase 1.
+Serve `client/dist` with a web server that falls back to `index.html` for React routes and reverse-proxies `/api` to the API on port 4000. Set `NODE_ENV=production`, a real `DATABASE_URL`, a strong `JWT_SECRET`, and the exact HTTPS `CLIENT_ORIGIN`. Cookies are Secure in production. Express binds to loopback by default for a same-machine reverse proxy; adapt the bind address and trusted-proxy configuration deliberately for container/platform deployments. The development Compose password must not be reused in production. No production host is configured or deployed.
 
 ## Scope and remaining limits
 
@@ -211,3 +211,51 @@ All requested Phase 1 flows are implemented. Privacy controls are persisted pref
 Before a public launch, choose hosting and secret management, configure HTTPS/reverse proxy and backups, establish operational monitoring, and decide whether to add account recovery/email verification. These deployment/product decisions are not required for the local Phase 1 flow. No communities, channels, real-time chat, feed, leaderboards, XP, achievements, challenges, public journals, or build logs have been added.
 
 Framework setup references: [Tailwind + Vite](https://tailwindcss.com/docs/installation/using-vite), [shadcn + Vite](https://ui.shadcn.com/docs/installation/vite), [Prisma v6 documentation](https://www.prisma.io/docs/orm/v6).
+
+## Phase 2: habits, goals and activity
+
+The existing React → API service → Express route → controller → service → Prisma architecture is extended in place. New authenticated browser routes are `/habits`, `/habits/:id`, `/goals`, and `/goals/:id`. Dashboard and Analytics keep their original task/focus sections and add habits, goals, overall streaks, and the same reusable activity heatmap.
+
+### Models and additive migration
+
+- `Habit`: user-owned name, description, type, target value/direction, unit, active flag and timestamps. Types are `BOOLEAN`, `NUMBER`, `DURATION`, `PERCENTAGE`, `COUNTER`. Target direction is `AT_LEAST` or `AT_MOST` (inclusive).
+- `HabitEntry`: parent habit, productivity date, numeric value, stored completion decision and timestamps. `(habitId, productivityDate)` is unique; history is relational, not JSON.
+- `Goal`: user-owned title, description, optional target date, `ACTIVE` / `COMPLETED` / `ARCHIVED` status and timestamps.
+- `GoalMilestone`: parent goal, title, description, unique per-goal order, completion flag/date and timestamps.
+
+`20261002010000_phase2_habits_goals` adds these tables, enums, foreign keys and indexes plus an index for task activity. It does not reset the database or drop existing tables. Deploy it with the existing `npm run db:deploy`. Deleting a habit or goal through its confirmed UI/API removes only its own children. Archiving preserves history.
+
+### Phase 2 endpoints
+
+All routes below require the existing authenticated cookie. Identity comes from middleware; client-supplied ownership fields are rejected.
+
+| Method               | Route                                       | Purpose                                                                   |
+| -------------------- | ------------------------------------------- | ------------------------------------------------------------------------- |
+| GET / POST           | `/api/habits`                               | List own habits (`scope=active`, `archived`, `all`) / create              |
+| GET / PATCH / DELETE | `/api/habits/:id`                           | Read / edit / delete own habit                                            |
+| POST                 | `/api/habits/:id/entries`                   | Upsert a date's value; default date comes from user settings              |
+| GET                  | `/api/habits/:id/entries?days=30`           | Selected history; 7, 30, 90 or 365 days                                   |
+| DELETE               | `/api/habits/:id/entries/:productivityDate` | Clear a recorded entry                                                    |
+| GET                  | `/api/habits/:id/analytics?days=30`         | Habit, history, chart, statistics and all-time streaks                    |
+| GET / POST           | `/api/goals`                                | List own goals (`status=ALL`, `ACTIVE`, `COMPLETED`, `ARCHIVED`) / create |
+| GET / PATCH / DELETE | `/api/goals/:id`                            | Read / edit / delete own goal                                             |
+| POST                 | `/api/goals/:id/milestones`                 | Append a milestone                                                        |
+| PUT                  | `/api/goals/:id/milestones/order`           | Reorder using every milestone UUID exactly once                           |
+| PATCH / DELETE       | `/api/milestones/:id`                       | Edit, complete/reopen, or delete a milestone                              |
+| POST                 | `/api/milestones/:id/complete`              | Complete a milestone idempotently                                         |
+| GET                  | `/api/analytics/overview`                   | Daily/weekly/monthly productivity, focus, habit trends/streaks and goals  |
+| GET                  | `/api/analytics/heatmap?days=365`           | Real database activity for up to 365 productivity days                    |
+
+Boolean values are 0 or 1 with target 1 and unit `completed`; duration values/targets are integer minutes; percentage values/targets are 0–100 with positive targets and unit `%`; counters are nonnegative integers; numbers may be fractional. Numeric targets are positive. Habit entry dates can be backfilled within the last 365 productivity days, including today. Future dates are rejected.
+
+Completion decisions are saved with each entry. Editing a target/direction preserves historical success; re-saving an entry evaluates the current target. The current progress bar compares its value with the current target. Tracking type and unit cannot change after history exists; create a new habit instead. Archived habits remain in historical analytics but cannot receive new entries until restored.
+
+Habit statistics omit missing days from average/min/max and calculate target completion as successful / tracked days. Charts leave missing dates untracked. Current and best streaks use all-time successful date labels even when a shorter chart range is selected. Overall activity counts completed tasks + successful habits + completed focus sessions; the Focus heatmap uses minutes. Goals do not count as daily meaningful activity. Goal progress is rounded completed milestones / total milestones; an empty goal is 0%. Goal status is an explicit preference, separate from milestone progress. A goal supports at most 100 milestones.
+
+Activity is grouped in PostgreSQL through Prisma, with fixed query counts rather than per-day/per-habit queries. Reordering and entry writes use parent-row locks and transactions. Shared client read caching deduplicates concurrent consumers, invalidates affected data after mutations, and rejects late responses from old accounts or old requests. Filters use the same fetched heatmap data. Visibility and productivity-day changes refresh cached resources.
+
+### Phase 2 verification
+
+Use the same check commands above. The full PostgreSQL test run has 44 passing tests, including Phase 1 regression, typed habit validation, date/DST boundaries, ownership for every new API, concurrent upserts/appends/reordering, snapshot history, derived progress, real heatmap aggregates, and client cache deduplication/invalidation/account isolation.
+
+The two Playwright workflows cover Phase 1 and all five Phase 2 habit types, edit validation, archive/restore, history ranges and editing, milestones/progress/reorder, persisted data after reload, populated dashboard, heatmap keyboard/filter behavior, tablet/mobile width, and explicit loading/error/retry states. Screenshots use disposable test data that is removed afterward. No mock statistics or seed accounts are installed in the application.

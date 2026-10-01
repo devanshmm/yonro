@@ -1,7 +1,16 @@
 import { prisma } from '../lib/prisma.js';
 import { AppError } from '../utils/errors.js';
-import { getProductivityDay, trailingDateRange, dateSequence, addDays } from '../utils/productivityDay.js';
-import { calculateHabitProgress, calculateHabitStatistics, isHabitSuccessful } from '../utils/habitMetrics.js';
+import {
+  getProductivityDay,
+  trailingDateRange,
+  dateSequence,
+  addDays,
+} from '../utils/productivityDay.js';
+import {
+  calculateHabitProgress,
+  calculateHabitStatistics,
+  isHabitSuccessful,
+} from '../utils/habitMetrics.js';
 import { habitDefinitionSchema, validateEntryValue } from '../validators/habitSchemas.js';
 import { lockOwnedHabit } from './ownershipService.js';
 
@@ -59,7 +68,10 @@ export async function updateHabit(user, id, changes) {
     if (definition.type !== existing.type || definition.unit !== existing.unit) {
       const entryCount = await transaction.habitEntry.count({ where: { habitId: id } });
       if (entryCount > 0) {
-        throw new AppError(409, 'Tracking type and unit cannot change after recording history. Create a new habit instead.');
+        throw new AppError(
+          409,
+          'Tracking type and unit cannot change after recording history. Create a new habit instead.',
+        );
       }
     }
     await transaction.habit.update({ where: { id }, data: definition });
@@ -74,7 +86,9 @@ export async function deleteHabit(userId, id) {
 export async function deleteEntry(userId, habitId, productivityDate) {
   await prisma.$transaction(async (transaction) => {
     await lockOwnedHabit(transaction, userId, habitId);
-    await transaction.habitEntry.delete({ where: { habitId_productivityDate: { habitId, productivityDate } } });
+    await transaction.habitEntry.delete({
+      where: { habitId_productivityDate: { habitId, productivityDate } },
+    });
   });
 }
 
@@ -82,7 +96,10 @@ export async function recordEntry(user, habitId, data) {
   const today = getProductivityDay(user.settings);
   const productivityDate = data.productivityDate ?? today;
   if (productivityDate > today || productivityDate < addDays(today, -364)) {
-    throw new AppError(400, 'Entries must be within the previous 365 productivity days, including today');
+    throw new AppError(
+      400,
+      'Entries must be within the previous 365 productivity days, including today',
+    );
   }
   return prisma.$transaction(async (transaction) => {
     await lockOwnedHabit(transaction, user.id, habitId);
@@ -102,8 +119,15 @@ export async function recordEntry(user, habitId, data) {
 }
 
 export async function listEntries(user, habitId, days) {
-  await prisma.habit.findUniqueOrThrow({ where: { id: habitId, userId: user.id }, select: { id: true } });
-  const range = trailingDateRange(user.settings, days);
+  await prisma.habit.findUniqueOrThrow({
+    where: { id: habitId, userId: user.id },
+    select: { id: true },
+  });
+  return fetchEntryHistory(user.settings, habitId, days);
+}
+
+async function fetchEntryHistory(settings, habitId, days) {
+  const range = trailingDateRange(settings, days);
   const entries = await prisma.habitEntry.findMany({
     where: { habitId, productivityDate: { gte: range.startDate, lte: range.endDate } },
     orderBy: { productivityDate: 'asc' },
@@ -115,7 +139,7 @@ export async function getHabitAnalytics(user, habitId, days) {
   const habit = await getHabit(user, habitId);
   const today = getProductivityDay(user.settings);
   const [history, successfulHistory] = await Promise.all([
-    listEntries(user, habitId, days),
+    fetchEntryHistory(user.settings, habitId, days),
     prisma.habitEntry.findMany({
       where: { habitId, completed: true, productivityDate: { lte: today } },
       select: { productivityDate: true },
@@ -125,8 +149,18 @@ export async function getHabitAnalytics(user, habitId, days) {
   const successfulDates = successfulHistory.map((entry) => entry.productivityDate);
   const chart = dateSequence(history.startDate, history.endDate).map((date) => {
     const entry = entriesByDate.get(date);
-    return { date, value: entry?.value ?? null, completed: entry?.completed ?? false, tracked: Boolean(entry) };
+    return {
+      date,
+      value: entry?.value ?? null,
+      completed: entry?.completed ?? false,
+      tracked: Boolean(entry),
+    };
   });
 
-  return { habit, ...history, statistics: calculateHabitStatistics(history.entries, successfulDates, today), chart };
+  return {
+    habit,
+    ...history,
+    statistics: calculateHabitStatistics(history.entries, successfulDates, today),
+    chart,
+  };
 }

@@ -50,7 +50,10 @@ export function FocusTimer({ compact = false }) {
       <div className="panel-heading">
         <h2>{compact ? 'Time to lock in' : 'Your focus, uninterrupted.'}</h2>
         {compact && (
-          <Link to="/focus" aria-label="Open focus timer">
+          <Link
+            to="/focus"
+            aria-label="Open focus timer"
+          >
             <ArrowUpRight size={18} />
           </Link>
         )}
@@ -58,9 +61,15 @@ export function FocusTimer({ compact = false }) {
       <p className="text-muted-foreground text-sm">
         One thing at a time. That’s where progress starts.
       </p>
-      <div className="timer-ring" style={{ '--progress': `${progress}%` }}>
+      <div
+        className="timer-ring"
+        style={{ '--progress': `${progress}%` }}
+      >
         <div>
-          <span className="timer-number" aria-live="off">
+          <span
+            className="timer-number"
+            aria-live="off"
+          >
             {String(Math.floor(remaining / 60)).padStart(2, '0')}
             <b>:</b>
             {String(remaining % 60).padStart(2, '0')}
@@ -121,17 +130,26 @@ export function FocusTimer({ compact = false }) {
       )}
       <div className="timer-controls">
         {timer.phase === 'running' ? (
-          <Button onClick={timer.pause} variant="secondary">
+          <Button
+            onClick={timer.pause}
+            variant="secondary"
+          >
             <Pause size={16} />
             Pause session
           </Button>
         ) : timer.phase === 'idle' || timer.phase === 'paused' ? (
           <Button onClick={timer.start}>
-            <Play size={16} fill="currentColor" />
+            <Play
+              size={16}
+              fill="currentColor"
+            />
             {timer.phase === 'paused' ? 'Resume session' : 'Start focus'}
           </Button>
         ) : timer.pending ? (
-          <Button onClick={timer.save} disabled={timer.phase === 'saving'}>
+          <Button
+            onClick={timer.save}
+            disabled={timer.phase === 'saving'}
+          >
             {timer.phase === 'saving' ? 'Saving…' : 'Save session'}
           </Button>
         ) : (
