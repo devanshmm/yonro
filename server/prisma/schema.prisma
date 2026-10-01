@@ -1,0 +1,178 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  COMPLETED
+  SKIPPED
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum ProfileVisibility {
+  PRIVATE
+  PUBLIC
+}
+
+model User {
+  id            String         @id @default(uuid()) @db.Uuid
+  firstName     String
+  lastName      String
+  username      String         @unique
+  email         String         @unique
+  passwordHash  String
+  profileImage  String?
+  bio           String?        @db.VarChar(500)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  settings      UserSettings?
+  tasks         Task[]
+  focusSessions FocusSession[]
+  authSessions  AuthSession[]
+  habits        Habit[]
+  goals         Goal[]
+}
+
+model UserSettings {
+  userId            String            @id @db.Uuid
+  dayStartTime      String            @default("04:00") @db.VarChar(5)
+  timezone          String            @default("UTC")
+  profileVisibility ProfileVisibility @default(PRIVATE)
+  showActivity      Boolean           @default(false)
+  showFocusTime     Boolean           @default(false)
+  showStreak        Boolean           @default(false)
+  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Task {
+  id               String       @id @default(uuid()) @db.Uuid
+  userId           String       @db.Uuid
+  title            String       @db.VarChar(200)
+  description      String?      @db.VarChar(2000)
+  category         String       @default("Personal") @db.VarChar(50)
+  priority         TaskPriority @default(MEDIUM)
+  status           TaskStatus   @default(TODO)
+  estimatedMinutes Int?
+  productivityDate String       @db.VarChar(10)
+  completedAt      DateTime?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, productivityDate])
+  @@index([userId, status, productivityDate])
+}
+
+model FocusSession {
+  id               String   @id @default(uuid()) @db.Uuid
+  userId           String   @db.Uuid
+  startedAt        DateTime
+  endedAt          DateTime
+  durationSeconds  Int
+  productivityDate String   @db.VarChar(10)
+  createdAt        DateTime @default(now())
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, productivityDate])
+}
+
+model AuthSession {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+enum HabitType {
+  BOOLEAN
+  NUMBER
+  DURATION
+  PERCENTAGE
+  COUNTER
+}
+
+enum HabitTargetDirection {
+  AT_LEAST
+  AT_MOST
+}
+
+enum GoalStatus {
+  ACTIVE
+  COMPLETED
+  ARCHIVED
+}
+
+model Habit {
+  id              String               @id @default(uuid()) @db.Uuid
+  userId          String               @db.Uuid
+  name            String               @db.VarChar(100)
+  description     String?              @db.VarChar(2000)
+  type            HabitType
+  targetValue     Float
+  targetDirection HabitTargetDirection @default(AT_LEAST)
+  unit            String               @db.VarChar(40)
+  active          Boolean              @default(true)
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+  user            User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entries         HabitEntry[]
+
+  @@index([userId, active])
+}
+
+model HabitEntry {
+  id               String   @id @default(uuid()) @db.Uuid
+  habitId          String   @db.Uuid
+  productivityDate String   @db.VarChar(10)
+  value            Float
+  completed        Boolean
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  habit            Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
+
+  @@unique([habitId, productivityDate])
+  @@index([productivityDate, completed])
+}
+
+model Goal {
+  id          String          @id @default(uuid()) @db.Uuid
+  userId      String          @db.Uuid
+  title       String          @db.VarChar(200)
+  description String?         @db.VarChar(2000)
+  targetDate  String?         @db.VarChar(10)
+  status      GoalStatus      @default(ACTIVE)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  milestones  GoalMilestone[]
+
+  @@index([userId, status])
+}
+
+model GoalMilestone {
+  id          String    @id @default(uuid()) @db.Uuid
+  goalId      String    @db.Uuid
+  title       String    @db.VarChar(200)
+  description String?   @db.VarChar(2000)
+  order       Int
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  goal        Goal      @relation(fields: [goalId], references: [id], onDelete: Cascade)
+
+  @@unique([goalId, order])
+}
