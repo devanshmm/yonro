@@ -26,33 +26,38 @@ enum ProfileVisibility {
 }
 
 model User {
-  id            String         @id @default(uuid()) @db.Uuid
-  firstName     String
-  lastName      String
-  username      String         @unique
-  email         String         @unique
-  passwordHash  String
-  profileImage  String?
-  bio           String?        @db.VarChar(500)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  settings      UserSettings?
-  tasks         Task[]
-  focusSessions FocusSession[]
-  authSessions  AuthSession[]
-  habits        Habit[]
-  goals         Goal[]
+  id             String               @id @default(uuid()) @db.Uuid
+  firstName      String
+  lastName       String
+  username       String               @unique
+  email          String               @unique
+  passwordHash   String
+  profileImage   String?
+  bio            String?              @db.VarChar(500)
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+  settings       UserSettings?
+  tasks          Task[]
+  focusSessions  FocusSession[]
+  authSessions   AuthSession[]
+  habits         Habit[]
+  goals          Goal[]
+  xpTransactions XPTransaction[]
+  achievements   UserAchievement[]
+  gamification   GamificationProfile?
+  focusRuns      FocusRun[]
 }
 
 model UserSettings {
-  userId            String            @id @db.Uuid
-  dayStartTime      String            @default("04:00") @db.VarChar(5)
-  timezone          String            @default("UTC")
-  profileVisibility ProfileVisibility @default(PRIVATE)
-  showActivity      Boolean           @default(false)
-  showFocusTime     Boolean           @default(false)
-  showStreak        Boolean           @default(false)
-  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId             String            @id @db.Uuid
+  dayStartTime       String            @default("04:00") @db.VarChar(5)
+  timezone           String            @default("UTC")
+  profileVisibility  ProfileVisibility @default(PRIVATE)
+  showActivity       Boolean           @default(false)
+  showFocusTime      Boolean           @default(false)
+  showStreak         Boolean           @default(false)
+  showOnLeaderboards Boolean           @default(false)
+  user               User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Task {
@@ -80,6 +85,7 @@ model FocusSession {
   startedAt        DateTime
   endedAt          DateTime
   durationSeconds  Int
+  verifiedSeconds  Int      @default(0)
   productivityDate String   @db.VarChar(10)
   createdAt        DateTime @default(now())
   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -175,4 +181,76 @@ model GoalMilestone {
   goal        Goal      @relation(fields: [goalId], references: [id], onDelete: Cascade)
 
   @@unique([goalId, order])
+}
+
+enum XPSource {
+  TASK_COMPLETION
+  FOCUS_SESSION
+  HABIT_COMPLETION
+  GOAL_MILESTONE
+  STREAK_MILESTONE
+  ACHIEVEMENT
+}
+
+model XPTransaction {
+  id               String   @id @default(uuid()) @db.Uuid
+  userId           String   @db.Uuid
+  amount           Int
+  source           XPSource
+  sourceId         String   @db.VarChar(200)
+  description      String   @db.VarChar(300)
+  productivityDate String   @db.VarChar(10)
+  rewardDate       String   @db.VarChar(10)
+  createdAt        DateTime @default(now())
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, source, sourceId])
+  @@index([userId, createdAt])
+  @@index([userId, rewardDate, source])
+  @@index([createdAt, source])
+}
+
+model Achievement {
+  id          String            @id @db.Uuid
+  key         String            @unique @db.VarChar(60)
+  name        String            @db.VarChar(100)
+  description String            @db.VarChar(300)
+  icon        String            @db.VarChar(40)
+  xpReward    Int
+  createdAt   DateTime          @default(now())
+  users       UserAchievement[]
+}
+
+model UserAchievement {
+  id            String      @id @default(uuid()) @db.Uuid
+  userId        String      @db.Uuid
+  achievementId String      @db.Uuid
+  unlockedAt    DateTime    @default(now())
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Restrict)
+
+  @@unique([userId, achievementId])
+  @@index([userId, unlockedAt])
+}
+
+model GamificationProfile {
+  userId           String    @id @db.Uuid
+  currentStreak    Int       @default(0)
+  longestStreak    Int       @default(0)
+  streakValidUntil DateTime?
+  updatedAt        DateTime  @updatedAt
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model FocusRun {
+  id                 String    @id @db.Uuid
+  userId             String    @db.Uuid
+  targetSeconds      Int
+  startedAt          DateTime  @default(now())
+  resumedAt          DateTime?
+  activeMilliseconds Int       @default(0)
+  state              String    @default("RUNNING") @db.VarChar(12)
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, state])
 }

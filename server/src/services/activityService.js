@@ -65,20 +65,20 @@ export async function getActivityDays(userId, startDate, endDate) {
   return [...dailyActivity.values()].map(decorateActivityDay);
 }
 
-export async function getMeaningfulHistory(userId, today) {
+export async function getMeaningfulHistory(userId, today, database = prisma) {
   const dates = { lte: today };
   const [tasks, focus, habits] = await Promise.all([
-    prisma.task.groupBy({
+    database.task.groupBy({
       by: ['productivityDate'],
       where: { userId, status: 'COMPLETED', productivityDate: dates },
       _count: { _all: true },
     }),
-    prisma.focusSession.groupBy({
+    database.focusSession.groupBy({
       by: ['productivityDate'],
       where: { userId, productivityDate: dates, durationSeconds: { gt: 0 } },
       _count: { _all: true },
     }),
-    prisma.habitEntry.groupBy({
+    database.habitEntry.groupBy({
       by: ['habitId', 'productivityDate'],
       where: { habit: { userId }, completed: true, productivityDate: dates },
       _count: { _all: true },

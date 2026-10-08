@@ -69,17 +69,23 @@ export const useProductivity = create((set, get) => ({
   },
   createTask: async (body) => {
     await api.post('/tasks', body);
-    useResources.getState().invalidate(['activity', 'overview']);
+    useResources
+      .getState()
+      .invalidate(['activity', 'overview', 'gamification', 'xp-history', 'leaderboard:']);
     await get().refresh(true);
   },
   updateTask: async (id, body) => {
     await api.patch(`/tasks/${id}`, body);
-    useResources.getState().invalidate(['activity', 'overview']);
+    useResources
+      .getState()
+      .invalidate(['activity', 'overview', 'gamification', 'xp-history', 'leaderboard:']);
     await get().refresh(true);
   },
   deleteTask: async (id) => {
     await api.delete(`/tasks/${id}`);
-    useResources.getState().invalidate(['activity', 'overview']);
+    useResources
+      .getState()
+      .invalidate(['activity', 'overview', 'gamification', 'xp-history', 'leaderboard:']);
     await get().refresh(true);
   },
 }));

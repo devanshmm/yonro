@@ -15,7 +15,7 @@ export default function Settings() {
     e.preventDefault();
     const form = e.currentTarget,
       body = Object.fromEntries(new FormData(form));
-    ['showActivity', 'showFocusTime', 'showStreak'].forEach((key) => {
+    ['showActivity', 'showFocusTime', 'showStreak', 'showOnLeaderboards'].forEach((key) => {
       body[key] = form.elements[key].checked;
     });
     setBusy(true);
@@ -99,7 +99,10 @@ export default function Settings() {
             <ShieldCheck size={21} />
             <div>
               <h2>Privacy preferences</h2>
-              <p>Saved for future social features. Your workspace is personal in Phase 1.</p>
+              <p>
+                Rankings are optional. A public profile and your sharing choices control what
+                appears.
+              </p>
             </div>
           </div>
           <label>
@@ -117,6 +120,7 @@ export default function Settings() {
             ['showActivity', 'Show activity'],
             ['showFocusTime', 'Show focus time'],
             ['showStreak', 'Show current streak'],
+            ['showOnLeaderboards', 'Participate in public leaderboards'],
           ].map(([key, label]) => (
             <label
               className="switch-row"
@@ -130,6 +134,10 @@ export default function Settings() {
               />
             </label>
           ))}
+          <p className="info-note">
+            Leaderboard participation is off by default. You also need a public profile. Activity,
+            focus and streak rankings respect the sharing switches above.
+          </p>
         </section>
         {error && <ErrorState error={error} />}
         <div className="settings-save">

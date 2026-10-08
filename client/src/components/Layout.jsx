@@ -14,11 +14,13 @@ import {
   ChevronRight,
   Repeat2,
   Flag,
+  Trophy,
 } from 'lucide-react';
 import { useAuth } from '@/stores/auth';
 import { useProductivity } from '@/stores/productivity';
 import { useFocus } from '@/stores/focus';
 import { useResources } from '@/stores/resources';
+import { GamificationEvents } from './gamification/GamificationEvents';
 import { useTimerClock } from './FocusTimer';
 import { Button } from './ui/button';
 import { ErrorState, LoadingState } from './common';
@@ -30,6 +32,7 @@ const links = [
   { to: '/goals', label: 'Goals', icon: Flag },
   { to: '/focus', label: 'Focus', icon: Timer },
   { to: '/analytics', label: 'Analytics', icon: ChartNoAxesCombined },
+  { to: '/gamification', label: 'Rewards', icon: Trophy },
   { to: '/settings', label: 'Settings', icon: Settings2 },
 ];
 export function Sidebar({ open, close }) {
@@ -46,8 +49,8 @@ export function Sidebar({ open, close }) {
       return;
     setBusy(true);
     try {
+      await state.reset();
       await logout();
-      state.reset();
       useProductivity.getState().clear();
     } catch (e) {
       setError(errorMessage(e));
@@ -176,7 +179,7 @@ export function TopBar({ openMenu }) {
             ? dateLabel(date, { weekday: 'long', month: 'short', day: 'numeric' })
             : 'Your daily workspace'}
         </span>
-        <span className="phase-badge">PHASE 02</span>
+        <span className="phase-badge">LEVEL UP YOUR DAY</span>
       </div>
     </header>
   );
@@ -228,6 +231,7 @@ export function Layout() {
     );
   return (
     <div className="app-shell">
+      <GamificationEvents />
       <Sidebar
         open={open}
         close={() => setOpen(false)}

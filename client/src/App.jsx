@@ -10,6 +10,7 @@ import Tasks from './pages/Tasks';
 import Focus from './pages/Focus';
 import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
+import GamificationPage from './pages/GamificationPage';
 import HabitsPage from './pages/HabitsPage';
 import HabitDetailsPage from './pages/HabitDetailsPage';
 import GoalsPage from './pages/GoalsPage';
@@ -73,6 +74,19 @@ export default function App() {
           <Route
             path="goals/:id"
             element={<GoalDetailsPage />}
+          />
+          <Route
+            path="gamification"
+            element={<GamificationPage />}
+          />
+          <Route
+            path="leaderboards"
+            element={
+              <GamificationPage
+                key="rankings"
+                rankings
+              />
+            }
           />
           <Route
             path="*"

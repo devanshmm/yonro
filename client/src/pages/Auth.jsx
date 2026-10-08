@@ -57,34 +57,51 @@ export default function Auth() {
           </h1>
           <p>
             Your goals deserve more than an open tab.
-            <br />
-            Turn intention into a little progress, every day.
+            <br />A clear plan. Deep focus. Progress that compounds.
           </p>
-          <div className="auth-illustration">
-            <div className="mini-task">
-              <span className="task-check checked">
-                <Check size={14} />
+          <div
+            className="auth-product-preview"
+            aria-hidden="true"
+          >
+            <div className="auth-focus-preview">
+              <span className="preview-label">
+                <Timer size={13} /> FOCUS MODE
               </span>
-              <span>Show up for yourself</span>
-              <span className="mini-badge">TODAY</span>
-            </div>
-            <div className="mini-task">
-              <span className="task-check checked">
-                <Check size={14} />
-              </span>
-              <span>Make something meaningful</span>
-            </div>
-            <div className="mini-task">
-              <span className="task-check" />
-              <span>Keep the momentum going</span>
-            </div>
-            <div className="mini-progress">
-              <div>
-                <span>Small steps. Real progress.</span>
-                <strong>67%</strong>
+              <div className="preview-orbit">
+                <div>
+                  <strong>
+                    25<span>:</span>00
+                  </strong>
+                  <small>ONE THING AT A TIME</small>
+                </div>
               </div>
-              <div className="progress-track">
-                <div style={{ width: '67%' }} />
+              <div className="preview-focus-caption">
+                <span /> Distractions off. Focus on.
+              </div>
+            </div>
+            <div className="auth-plan-preview">
+              <span className="preview-label">
+                <Target size={13} /> THE DAILY PLAN
+              </span>
+              <div className="mini-task">
+                <span className="task-check checked">
+                  <Check size={13} />
+                </span>
+                <span>Set a clear intention</span>
+              </div>
+              <div className="mini-task">
+                <span className="task-check checked">
+                  <Check size={13} />
+                </span>
+                <span>Make meaningful progress</span>
+              </div>
+              <div className="mini-task">
+                <span className="task-check" />
+                <span>Build your next chapter</span>
+              </div>
+              <div className="preview-trend">
+                <TrendingUp size={16} />
+                <span>Consistency is your advantage.</span>
               </div>
             </div>
           </div>
@@ -114,7 +131,7 @@ export default function Auth() {
           <p>
             {signup
               ? 'A little intention today. A different tomorrow.'
-              : 'Take a breath. Let’s pick up where you left off.'}
+              : 'Your next focused day starts here.'}
           </p>
           <form
             className="form-stack"

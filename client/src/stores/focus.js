@@ -1,6 +1,12 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { api } from '@/lib/api';
+import {
+  queueFocusCommand,
+  registerFocusRun,
+  updateFocusRun,
+  saveFocusSession,
+  cancelActiveFocusRuns,
+} from '@/services/focusApi';
 import { errorMessage } from '@/lib/utils';
 import { useProductivity } from './productivity';
 import { useResources } from './resources';
@@ -32,16 +38,31 @@ export const useFocus = create(
       },
       start: () => {
         const state = get();
-        if (state.phase === 'idle')
+        if (state.phase === 'idle') {
+          const sessionId = crypto.randomUUID();
           set({
             phase: 'running',
             startedAt: Date.now(),
             runningSince: Date.now(),
             elapsedMs: 0,
-            sessionId: crypto.randomUUID(),
+            sessionId,
             error: null,
           });
-        else if (state.phase === 'paused') set({ phase: 'running', runningSince: Date.now() });
+          void queueFocusCommand(
+            () => registerFocusRun(sessionId, state.targetSeconds),
+            (error) => {
+              if (get().sessionId === sessionId) set({ error: errorMessage(error) });
+            },
+          );
+        } else if (state.phase === 'paused') {
+          set({ phase: 'running', runningSince: Date.now() });
+          void queueFocusCommand(
+            () => updateFocusRun(state.sessionId, 'resume'),
+            (error) => {
+              if (get().sessionId === state.sessionId) set({ error: errorMessage(error) });
+            },
+          );
+        }
       },
       pause: () => {
         if (get().phase === 'running') {
@@ -49,10 +70,25 @@ export const useFocus = create(
             void get().complete();
             return;
           }
+          const sessionId = get().sessionId;
           set({ elapsedMs: elapsed(get()), runningSince: null, phase: 'paused' });
+          void queueFocusCommand(
+            () => updateFocusRun(sessionId, 'pause'),
+            (error) => {
+              if (get().sessionId === sessionId) set({ error: errorMessage(error) });
+            },
+          );
         }
       },
-      reset: () => set({ ...initial, ownerId: get().ownerId, targetSeconds: get().targetSeconds }),
+      reset: async () => {
+        const state = get();
+        set({ ...initial, ownerId: state.ownerId, targetSeconds: state.targetSeconds });
+        await queueFocusCommand(cancelActiveFocusRuns, (error) => {
+          if (get().ownerId === state.ownerId) {
+            set({ error: errorMessage(error) });
+          }
+        });
+      },
       complete: async () => {
         const state = get();
         if (state.phase !== 'running' || elapsed(state) < state.targetSeconds * 1000) return;
@@ -77,10 +113,12 @@ export const useFocus = create(
         const stillCurrent = () => get().ownerId === ownerId && get().sessionId === sessionId;
         set({ phase: 'saving', error: null });
         try {
-          await api.post('/focus/sessions', pending);
+          await saveFocusSession(pending);
           if (!stillCurrent()) return;
           set({ phase: 'complete', pending: null });
-          useResources.getState().invalidate(['activity', 'overview']);
+          useResources
+            .getState()
+            .invalidate(['activity', 'overview', 'gamification', 'xp-history', 'leaderboard:']);
           await useProductivity.getState().refresh(true);
         } catch (error) {
           if (stillCurrent()) set({ phase: 'complete', error: errorMessage(error) });

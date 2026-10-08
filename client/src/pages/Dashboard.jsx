@@ -9,6 +9,7 @@ import { TaskList, QuickAdd, TaskEditor } from '@/components/TaskList';
 import { FocusTimer } from '@/components/FocusTimer';
 import { WeeklyChart } from '@/components/WeeklyChart';
 import { minutes } from '@/lib/utils';
+import { GamificationSummary } from '@/components/gamification/GamificationSummary';
 import { DashboardGrowth } from '@/components/dashboard/DashboardGrowth';
 import { ProductivityHeatmap } from '@/components/activity/ProductivityHeatmap';
 export default function Dashboard() {
@@ -50,6 +51,7 @@ export default function Dashboard() {
           New task
         </Button>
       </div>
+      <GamificationSummary />
       <div className="stat-grid">
         <StatCard
           label="Current streak"

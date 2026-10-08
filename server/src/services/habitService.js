@@ -13,6 +13,7 @@ import {
 } from '../utils/habitMetrics.js';
 import { habitDefinitionSchema, validateEntryValue } from '../validators/habitSchemas.js';
 import { lockOwnedHabit } from './ownershipService.js';
+import { rewardedAction } from './rewardService.js';
 
 function presentHabit(record) {
   const { entries, ...habit } = record;
@@ -60,7 +61,7 @@ function trackingDefinition(habit) {
 }
 
 export async function updateHabit(user, id, changes) {
-  await prisma.$transaction(async (transaction) => {
+  await rewardedAction(user.id, async (transaction) => {
     // Entry writes share this lock so an entry cannot evaluate a half-updated target.
     await lockOwnedHabit(transaction, user.id, id);
     const existing = await transaction.habit.findUniqueOrThrow({ where: { id } });
@@ -75,20 +76,25 @@ export async function updateHabit(user, id, changes) {
       }
     }
     await transaction.habit.update({ where: { id }, data: definition });
+    return { result: undefined };
   });
   return getHabit(user, id);
 }
 
 export async function deleteHabit(userId, id) {
-  await prisma.habit.delete({ where: { id, userId } });
+  await rewardedAction(userId, async (transaction) => {
+    await transaction.habit.delete({ where: { id, userId } });
+    return { result: undefined };
+  });
 }
 
 export async function deleteEntry(userId, habitId, productivityDate) {
-  await prisma.$transaction(async (transaction) => {
+  await rewardedAction(userId, async (transaction) => {
     await lockOwnedHabit(transaction, userId, habitId);
     await transaction.habitEntry.delete({
       where: { habitId_productivityDate: { habitId, productivityDate } },
     });
+    return { result: undefined };
   });
 }
 
@@ -101,7 +107,7 @@ export async function recordEntry(user, habitId, data) {
       'Entries must be within the previous 365 productivity days, including today',
     );
   }
-  return prisma.$transaction(async (transaction) => {
+  return rewardedAction(user.id, async (transaction) => {
     await lockOwnedHabit(transaction, user.id, habitId);
     const habit = await transaction.habit.findUniqueOrThrow({ where: { id: habitId } });
     if (!habit.active) {
@@ -110,11 +116,22 @@ export async function recordEntry(user, habitId, data) {
     const value = validateEntryValue(habit, data.value);
     const completed = isHabitSuccessful(habit, value);
     // Store the success decision with the entry; later target edits do not rewrite history.
-    return transaction.habitEntry.upsert({
+    const entry = await transaction.habitEntry.upsert({
       where: { habitId_productivityDate: { habitId, productivityDate } },
       create: { habitId, productivityDate, value, completed },
       update: { value, completed },
     });
+    return {
+      result: entry,
+      event: completed
+        ? {
+            source: 'HABIT_COMPLETION',
+            sourceId: `${habitId}:${productivityDate}`,
+            description: 'Met a habit target',
+            productivityDate,
+          }
+        : null,
+    };
   });
 }
 

@@ -1,3 +1,6 @@
+import { gamificationRouter, leaderboardRouter } from './gamificationRoutes.js';
+import * as gamification from '../controllers/gamificationController.js';
+import { focusRunStartSchema, focusRunActionSchema } from '../validators/gamificationSchemas.js';
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
 import * as auth from '../controllers/authController.js';
@@ -55,4 +58,15 @@ router.get(
     'query',
   ),
   analytics.heatmap,
+);
+
+router.use('/gamification', gamificationRouter);
+router.use('/leaderboards', leaderboardRouter);
+router.post('/focus/runs', validate(focusRunStartSchema), gamification.startRun);
+router.delete('/focus/runs/active', gamification.cancelRuns);
+router.patch(
+  '/focus/runs/:id',
+  validate(v.idSchema, 'params'),
+  validate(focusRunActionSchema),
+  gamification.changeRun,
 );

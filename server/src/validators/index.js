@@ -47,6 +47,7 @@ export const settingsSchema = z
     showActivity: z.boolean(),
     showFocusTime: z.boolean(),
     showStreak: z.boolean(),
+    showOnLeaderboards: z.boolean(),
   })
   .partial()
   .strict()

@@ -2,7 +2,9 @@ import { api } from '@/lib/api';
 import { useResources } from '@/stores/resources';
 
 function goalChanged() {
-  useResources.getState().invalidate(['goals', 'goal:', 'overview']);
+  useResources
+    .getState()
+    .invalidate(['goals', 'goal:', 'overview', 'gamification', 'xp-history', 'leaderboard:']);
 }
 
 export async function fetchGoals() {

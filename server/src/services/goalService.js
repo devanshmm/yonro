@@ -3,6 +3,8 @@ import { prisma } from '../lib/prisma.js';
 import { AppError } from '../utils/errors.js';
 import { calculateGoalProgress } from '../utils/goalProgress.js';
 import { lockOwnedGoal } from './ownershipService.js';
+import { rewardedAction } from './rewardService.js';
+import { getProductivityDay } from '../utils/productivityDay.js';
 
 const milestoneOrder = { order: 'asc' };
 
@@ -49,7 +51,7 @@ export async function deleteGoal(userId, id) {
 }
 
 export async function createMilestone(userId, goalId, data) {
-  return prisma.$transaction(async (transaction) => {
+  return rewardedAction(userId, async (transaction) => {
     // Lock the parent to serialize append/reorder/delete operations on this goal.
     await lockOwnedGoal(transaction, userId, goalId);
     const milestones = await transaction.goalMilestone.findMany({
@@ -62,14 +64,15 @@ export async function createMilestone(userId, goalId, data) {
     const order = milestones.length
       ? Math.max(...milestones.map((milestone) => milestone.order)) + 1
       : 0;
-    return transaction.goalMilestone.create({
+    const milestone = await transaction.goalMilestone.create({
       data: { ...data, goalId, order, completedAt: data.completed ? new Date() : null },
     });
+    return { result: milestone, event: await milestoneEvent(transaction, userId, milestone) };
   });
 }
 
 export async function updateMilestone(userId, id, data) {
-  return prisma.$transaction(async (transaction) => {
+  return rewardedAction(userId, async (transaction) => {
     const existing = await transaction.goalMilestone.findUniqueOrThrow({
       where: { id, goal: { userId } },
     });
@@ -80,7 +83,14 @@ export async function updateMilestone(userId, id, data) {
     if (data.completed !== undefined) {
       completedAt = data.completed ? (current.completedAt ?? new Date()) : null;
     }
-    return transaction.goalMilestone.update({ where: { id }, data: { ...data, completedAt } });
+    const milestone = await transaction.goalMilestone.update({
+      where: { id },
+      data: { ...data, completedAt },
+    });
+    return {
+      result: milestone,
+      event: data.completed === true ? await milestoneEvent(transaction, userId, milestone) : null,
+    };
   });
 }
 
@@ -144,4 +154,17 @@ export async function deleteMilestone(userId, id) {
       remaining.map((milestone) => milestone.id),
     );
   });
+}
+
+async function milestoneEvent(transaction, userId, milestone) {
+  if (!milestone.completed) {
+    return null;
+  }
+  const settings = await transaction.userSettings.findUniqueOrThrow({ where: { userId } });
+  return {
+    source: 'GOAL_MILESTONE',
+    sourceId: milestone.id,
+    description: 'Completed a goal milestone',
+    productivityDate: getProductivityDay(settings),
+  };
 }

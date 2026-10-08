@@ -3,7 +3,17 @@ import { useResources } from '@/stores/resources';
 import { useProductivity } from '@/stores/productivity';
 
 async function habitChanged() {
-  useResources.getState().invalidate(['habits', 'habit:', 'activity', 'overview']);
+  useResources
+    .getState()
+    .invalidate([
+      'habits',
+      'habit:',
+      'activity',
+      'overview',
+      'gamification',
+      'xp-history',
+      'leaderboard:',
+    ]);
   await useProductivity.getState().refreshToday();
 }
 

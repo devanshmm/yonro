@@ -156,7 +156,9 @@ test('Phase 2 habits, history, milestones, analytics, recovery and mobile', asyn
   await expect(page.locator('.heatmap-cell').nth(363)).toBeFocused();
   await capture(page, 'phase2-analytics');
   await page.setViewportSize({ width: 820, height: 1180 });
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await expect
+    .poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth))
+    .toBe(true);
   await page.setViewportSize({ width: 390, height: 844 });
   await expect
     .poll(() =>

@@ -8,6 +8,7 @@ import { errorHandler } from './middleware/errorHandler.js';
 import { AppError } from './utils/errors.js';
 export const app = express();
 app.disable('x-powered-by');
+app.set('trust proxy', config.TRUST_PROXY_HOPS);
 app.use(helmet());
 app.use(cors({ origin: config.CLIENT_ORIGIN, credentials: true }));
 app.use(express.json({ limit: '32kb' }));
