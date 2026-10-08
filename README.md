@@ -1,5 +1,7 @@
 # YONRO / LOCKIN
 
+Live app: [yonro-live.vercel.app](https://yonro-live.vercel.app). Frontend: Vercel Hobby; API: Render Free; PostgreSQL: Neon Free in Singapore.
+
 LOCKIN is a personal productivity workspace for people building toward their goals. YONRO is the repository name. Phases 1–3 implement authentication, personal tasks, a focus timer, daily progress, custom habits, long-term goals and milestones, overall streaks, activity heatmaps, expanded analytics, user preferences, backend-earned XP, levels, achievements, and privacy-controlled rankings. The interface uses a modern charcoal bento theme with crisp borders, strong typography and restrained cyan accents. Communities and communication features are reserved for later phases.
 
 ## Stack
@@ -327,3 +329,13 @@ The production API defaults to `0.0.0.0` and trusts one upstream proxy hop, matc
 Free Render web services sleep after inactivity and can take time to wake up. Render's free Postgres database expires after 30 days, which is why the deployment uses a separate Neon database. Free tiers have usage/storage limits and are suitable for an initial public hobby app; no paid resources are required by this configuration.
 
 References: [Render free hosting](https://render.com/docs/free), [Render public web-service binding](https://render.com/docs/web-services), [Vercel external rewrites](https://vercel.com/docs/routing/rewrites), [Neon free PostgreSQL](https://neon.com/docs/introduction/plans).
+
+### Current production deployment
+
+The working public app is **https://yonro-live.vercel.app**. Its API is **https://yonro-api.onrender.com**; frontend `/api` rewrites keep authentication cookies same-origin. The earlier `yonro-lockin.vercel.app` upload was an unconnected preview and is superseded by the live app.
+
+The cloud database is a dedicated PostgreSQL 17 Neon Free project in Singapore. All three migrations are applied. Production secrets are stored privately in Render, and `CLIENT_ORIGIN` is exactly `https://yonro-live.vercel.app`. Local user data was preserved locally and was not copied into the cloud; live users create new accounts.
+
+Verification passed 26 live API checks plus browser login, reload persistence, dashboard/rewards and logout. Checks covered signup, Secure/HttpOnly/SameSite cookies, persisted tasks/habits/goals, focus controls, XP/achievements, opted-out leaderboard privacy, rejected foreign-origin writes, logout revocation and SPA routes. Only the exact disposable verification account was deleted afterward.
+
+The frontend was uploaded with Vercel Drop; it is not yet connected for automatic Git deployments. For updates, use the official Vercel CLI on the `yonro-live` project or connect that project to this repository; keep the root `vercel.json` routing intact. The API reads this public repository and can be manually deployed from Render. The bundled claimable Vercel deployment endpoint has been retired and no claim URL was issued; these deployments belong directly to the signed-in account.
